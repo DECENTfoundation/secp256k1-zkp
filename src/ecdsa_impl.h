@@ -46,7 +46,7 @@ static const secp256k1_fe_t secp256k1_ecdsa_const_p_minus_order = SECP256K1_FE_C
     0, 0, 0, 1, 0x45512319UL, 0x50B75FC4UL, 0x402DA172UL, 0x2FC9BAEEUL
 );
 
-static int secp256k1_ecdsa_sig_parse(secp256k1_ecdsa_sig_t *r, const unsigned char *sig, int size) {
+static int secp256k1_ecdsa_sig_parse(secp256k1_ecdsa_sig_t *r, const unsigned char *sig, size_t size) {
     unsigned char ra[32] = {0}, sa[32] = {0};
     const unsigned char *rp;
     const unsigned char *sp;
@@ -57,14 +57,14 @@ static int secp256k1_ecdsa_sig_parse(secp256k1_ecdsa_sig_t *r, const unsigned ch
         return 0;
     }
     lenr = sig[3];
-    if (5+lenr >= size) {
+    if (5+lenr >= (int)size) {
         return 0;
     }
     lens = sig[lenr+5];
     if (sig[1] != lenr+lens+4) {
         return 0;
     }
-    if (lenr+lens+6 > size) {
+    if (lenr+lens+6 > (int)size) {
         return 0;
     }
     if (sig[2] != 0x02) {
@@ -109,7 +109,7 @@ static int secp256k1_ecdsa_sig_parse(secp256k1_ecdsa_sig_t *r, const unsigned ch
     return 1;
 }
 
-static int secp256k1_ecdsa_sig_serialize(unsigned char *sig, int *size, const secp256k1_ecdsa_sig_t *a) {
+static int secp256k1_ecdsa_sig_serialize(unsigned char *sig, size_t *size, const secp256k1_ecdsa_sig_t *a) {
     unsigned char r[33] = {0}, s[33] = {0};
     unsigned char *rp = r, *sp = s;
     int lenR = 33, lenS = 33;
@@ -117,7 +117,7 @@ static int secp256k1_ecdsa_sig_serialize(unsigned char *sig, int *size, const se
     secp256k1_scalar_get_b32(&s[1], &a->s);
     while (lenR > 1 && rp[0] == 0 && rp[1] < 0x80) { lenR--; rp++; }
     while (lenS > 1 && sp[0] == 0 && sp[1] < 0x80) { lenS--; sp++; }
-    if (*size < 6+lenS+lenR) {
+    if ((int)(*size) < 6+lenS+lenR) {
         return 0;
     }
     *size = 6 + lenS + lenR;

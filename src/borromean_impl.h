@@ -61,7 +61,7 @@ int secp256k1_borromean_verify(const secp256k1_ecmult_context_t* ecmult_ctx, sec
     int i;
     int j;
     int count;
-    int size;
+    size_t size;
     int overflow;
     VERIFY_CHECK(ecmult_ctx != NULL);
     VERIFY_CHECK(e0 != NULL);
@@ -116,7 +116,7 @@ int secp256k1_borromean_sign(const secp256k1_ecmult_context_t* ecmult_ctx, const
     int i;
     int j;
     int count;
-    int size;
+    size_t size;
     int overflow;
     VERIFY_CHECK(ecmult_ctx != NULL);
     VERIFY_CHECK(ecmult_gen_ctx != NULL);

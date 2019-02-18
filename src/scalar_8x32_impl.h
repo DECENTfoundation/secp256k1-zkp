@@ -113,7 +113,7 @@ SECP256K1_INLINE static int secp256k1_scalar_reduce(secp256k1_scalar_t *r, uint3
 }
 
 static int secp256k1_scalar_add(secp256k1_scalar_t *r, const secp256k1_scalar_t *a, const secp256k1_scalar_t *b) {
-    int overflow;
+    unsigned int overflow;
     uint64_t t = (uint64_t)a->d[0] + b->d[0];
     r->d[0] = t & 0xFFFFFFFFULL; t >>= 32;
     t += (uint64_t)a->d[1] + b->d[1];
@@ -130,7 +130,7 @@ static int secp256k1_scalar_add(secp256k1_scalar_t *r, const secp256k1_scalar_t 
     r->d[6] = t & 0xFFFFFFFFULL; t >>= 32;
     t += (uint64_t)a->d[7] + b->d[7];
     r->d[7] = t & 0xFFFFFFFFULL; t >>= 32;
-    overflow = t + secp256k1_scalar_check_overflow(r);
+    overflow = (unsigned int)(t + secp256k1_scalar_check_overflow(r));
     VERIFY_CHECK(overflow == 0 || overflow == 1);
     secp256k1_scalar_reduce(r, overflow);
     return overflow;
@@ -266,8 +266,8 @@ static int secp256k1_scalar_wnaf_force_odd(secp256k1_scalar_t *r) {
     uint32_t tl, th; \
     { \
         uint64_t t = (uint64_t)a * b; \
-        th = t >> 32;         /* at most 0xFFFFFFFE */ \
-        tl = t; \
+        th = (uint32_t)(t >> 32);         /* at most 0xFFFFFFFE */ \
+        tl = (uint32_t)t; \
     } \
     c0 += tl;                 /* overflow is handled on the next line */ \
     th += (c0 < tl) ? 1 : 0;  /* at most 0xFFFFFFFF */ \
@@ -281,8 +281,8 @@ static int secp256k1_scalar_wnaf_force_odd(secp256k1_scalar_t *r) {
     uint32_t tl, th; \
     { \
         uint64_t t = (uint64_t)a * b; \
-        th = t >> 32;         /* at most 0xFFFFFFFE */ \
-        tl = t; \
+        th = (uint32_t)(t >> 32);         /* at most 0xFFFFFFFE */ \
+        tl = (uint32_t)t; \
     } \
     c0 += tl;                 /* overflow is handled on the next line */ \
     th += (c0 < tl) ? 1 : 0;  /* at most 0xFFFFFFFF */ \
@@ -295,8 +295,8 @@ static int secp256k1_scalar_wnaf_force_odd(secp256k1_scalar_t *r) {
     uint32_t tl, th, th2, tl2; \
     { \
         uint64_t t = (uint64_t)a * b; \
-        th = t >> 32;               /* at most 0xFFFFFFFE */ \
-        tl = t; \
+        th = (uint32_t)(t >> 32);   /* at most 0xFFFFFFFE */ \
+        tl = (uint32_t)t; \
     } \
     th2 = th + th;                  /* at most 0xFFFFFFFE (in case th was 0x7FFFFFFF) */ \
     c2 += (th2 < th) ? 1 : 0;       /* never overflows by contract (verified the next line) */ \
@@ -484,7 +484,7 @@ static void secp256k1_scalar_reduce_512(secp256k1_scalar_t *r, const uint32_t *l
     r->d[7] = c & 0xFFFFFFFFUL; c >>= 32;
 
     /* Final reduction of r. */
-    secp256k1_scalar_reduce(r, c + secp256k1_scalar_check_overflow(r));
+    secp256k1_scalar_reduce(r, (unsigned int)(c + secp256k1_scalar_check_overflow(r)));
 }
 
 static void secp256k1_scalar_mul_512(uint32_t *l, const secp256k1_scalar_t *a, const secp256k1_scalar_t *b) {

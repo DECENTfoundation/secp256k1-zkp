@@ -12,7 +12,7 @@
 
 typedef struct {
     unsigned char point[33];
-    int pointlen;
+    size_t pointlen;
     unsigned char scalar[32];
 } bench_multiply_t;
 

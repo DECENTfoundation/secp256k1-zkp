@@ -252,7 +252,7 @@ static void secp256k1_fe_inv_all_var(size_t len, secp256k1_fe_t *r, const secp25
     secp256k1_fe_inv_var(&u, &r[--i]);
 
     while (i > 0) {
-        int j = i--;
+        size_t j = i--;
         secp256k1_fe_mul(&r[j], &r[i], &u);
         secp256k1_fe_mul(&u, &u, &a[j]);
     }

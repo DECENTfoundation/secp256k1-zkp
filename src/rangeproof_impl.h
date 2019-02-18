@@ -132,7 +132,7 @@ SECP256K1_INLINE static void secp256k1_rangeproof_pub_expand(const secp256k1_ran
 }
 
 SECP256K1_INLINE static int secp256k1_rangeproof_genrand(secp256k1_scalar_t *sec, secp256k1_scalar_t *s, unsigned char *message,
- int *rsizes, int rings, const unsigned char *nonce, const unsigned char *commit, const unsigned char *proof, int len) {
+ int *rsizes, int rings, const unsigned char *nonce, const unsigned char *commit, const unsigned char *proof, size_t len) {
     unsigned char tmp[32];
     secp256k1_rfc6979_hmac_sha256_t rng;
     secp256k1_scalar_t acc;
@@ -257,7 +257,7 @@ SECP256K1_INLINE static int secp256k1_range_proveparams(uint64_t *v, int *rings,
 /* strawman interface, writes proof in proof, a buffer of plen, proves with respect to min_value the range for commit which has the provided blinding factor and value. */
 SECP256K1_INLINE static int secp256k1_rangeproof_sign_impl(const secp256k1_ecmult_context_t* ecmult_ctx,
  const secp256k1_ecmult_gen_context_t* ecmult_gen_ctx, const secp256k1_ecmult_gen2_context_t* ecmult_gen2_ctx,
- const secp256k1_rangeproof_context_t* rangeproof_ctx, unsigned char *proof, int *plen, uint64_t min_value,
+ const secp256k1_rangeproof_context_t* rangeproof_ctx, unsigned char *proof, size_t *plen, uint64_t min_value,
  const unsigned char *commit, const unsigned char *blind, const unsigned char *nonce, int exp, int min_bits, uint64_t value){
     secp256k1_gej_t pubs[128];     /* Candidate digits for our proof, most inferred. */
     secp256k1_scalar_t s[128];     /* Signatures in our proof, most forged. */
@@ -274,7 +274,7 @@ SECP256K1_INLINE static int secp256k1_rangeproof_sign_impl(const secp256k1_ecmul
     int rings;                     /* How many digits will our proof cover. */
     int rsizes[32];                /* How many possible values there are for each place. */
     int secidx[32];                /* Which digit is the correct one. */
-    int len;                       /* Number of bytes used so far. */
+    size_t len;                    /* Number of bytes used so far. */
     int i;
     int overflow;
     int npub;
@@ -299,7 +299,7 @@ SECP256K1_INLINE static int secp256k1_rangeproof_sign_impl(const secp256k1_ecmul
         len += 8;
     }
     /* Do we have enough room for the proof? */
-    if (*plen - len < 32 * (npub + rings - 1) + 32 + ((rings+6) >> 3)) {
+    if ((int)(*plen - len) < 32 * (npub + rings - 1) + 32 + ((rings+6) >> 3)) {
         return 0;
     }
     secp256k1_sha256_initialize(&sha256_m);
@@ -354,7 +354,7 @@ SECP256K1_INLINE static int secp256k1_rangeproof_sign_impl(const secp256k1_ecmul
             return 0;
         }
         if (i < rings - 1) {
-            int size = 33;
+            size_t size = 33;
             secp256k1_ge_t c;
             /*OPT: split loop and batch invert.*/
             secp256k1_ge_set_gej_var(&c, &pubs[npub]);
@@ -411,7 +411,7 @@ SECP256K1_INLINE static void secp256k1_rangeproof_ch32xor(unsigned char *x, cons
 
 SECP256K1_INLINE static int secp256k1_rangeproof_rewind_inner(secp256k1_scalar_t *blind, uint64_t *v,
  unsigned char *m, int *mlen, secp256k1_scalar_t *ev, secp256k1_scalar_t *s,
- int *rsizes, int rings, const unsigned char *nonce, const unsigned char *commit, const unsigned char *proof, int len) {
+ int *rsizes, int rings, const unsigned char *nonce, const unsigned char *commit, const unsigned char *proof, size_t len) {
     secp256k1_scalar_t s_orig[128];
     secp256k1_scalar_t sec[32];
     secp256k1_scalar_t stmp;
@@ -533,7 +533,7 @@ SECP256K1_INLINE static int secp256k1_rangeproof_rewind_inner(secp256k1_scalar_t
 }
 
 SECP256K1_INLINE static int secp256k1_rangeproof_getheader_impl(int *offset, int *exp, int *mantissa, uint64_t *scale,
- uint64_t *min_value, uint64_t *max_value, const unsigned char *proof, int plen) {
+ uint64_t *min_value, uint64_t *max_value, const unsigned char *proof, size_t plen) {
     int i;
     int has_nz_range;
     int has_min;
@@ -590,7 +590,7 @@ SECP256K1_INLINE static int secp256k1_rangeproof_verify_impl(const secp256k1_ecm
  const secp256k1_ecmult_gen_context_t* ecmult_gen_ctx,
  const secp256k1_ecmult_gen2_context_t* ecmult_gen2_ctx, const secp256k1_rangeproof_context_t* rangeproof_ctx,
  unsigned char *blindout, uint64_t *value_out, unsigned char *message_out, int *outlen, const unsigned char *nonce,
- uint64_t *min_value, uint64_t *max_value, const unsigned char *commit, const unsigned char *proof, int plen) {
+ uint64_t *min_value, uint64_t *max_value, const unsigned char *commit, const unsigned char *proof, size_t plen) {
     secp256k1_gej_t accj;
     secp256k1_gej_t pubs[128];
     secp256k1_ge_t c;
@@ -632,7 +632,7 @@ SECP256K1_INLINE static int secp256k1_rangeproof_verify_impl(const secp256k1_ecm
         }
     }
     VERIFY_CHECK(rings <= 32);
-    if (plen - offset < 32 * (npub + rings - 1) + 32 + ((rings+6) >> 3)) {
+    if ((int)plen - offset < 32 * (npub + rings - 1) + 32 + ((rings+6) >> 3)) {
         return 0;
     }
     secp256k1_sha256_initialize(&sha256_m);
@@ -684,7 +684,7 @@ SECP256K1_INLINE static int secp256k1_rangeproof_verify_impl(const secp256k1_ecm
         }
         offset += 32;
     }
-    if (offset != plen) {
+    if (offset != (int)plen) {
         /*Extra data found, reject.*/
         return 0;
     }
@@ -709,8 +709,8 @@ SECP256K1_INLINE static int secp256k1_rangeproof_verify_impl(const secp256k1_ecm
             return 0;
         }
         secp256k1_ge_set_gej(&c, &accj);
-        i = 33;
-        secp256k1_eckey_pubkey_serialize(&c, commitrec, &i, 1);
+        plen = 33;
+        secp256k1_eckey_pubkey_serialize(&c, commitrec, &plen, 1);
         if (memcmp(commitrec, commit, 33) != 0) {
             return 0;
         }

@@ -6,6 +6,7 @@ extern "C" {
 # endif
 
 #include <stdint.h>
+#include <stddef.h>
 
 # if !defined(SECP256K1_GNUC_PREREQ)
 #  if defined(__GNUC__)&&defined(__GNUC_MINOR__)
@@ -94,9 +95,9 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_ecdsa_verify(
   const secp256k1_context_t* ctx,
   const unsigned char *msg32,
   const unsigned char *sig,
-  int siglen,
+  size_t siglen,
   const unsigned char *pubkey,
-  int pubkeylen
+  size_t pubkeylen
 ) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3) SECP256K1_ARG_NONNULL(5);
 
 /** A pointer to a function to deterministically generate a nonce.
@@ -172,7 +173,7 @@ int secp256k1_ecdsa_sign(
   const secp256k1_context_t* ctx,
   const unsigned char *msg32,
   unsigned char *sig,
-  int *siglen,
+  size_t *siglen,
   const unsigned char *seckey,
   secp256k1_nonce_function_t noncefp,
   const void *ndata
@@ -216,7 +217,7 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_ecdsa_recover_compact(
   const unsigned char *msg32,
   const unsigned char *sig64,
   unsigned char *pubkey,
-  int *pubkeylen,
+  size_t *pubkeylen,
   int compressed,
   int recid
 ) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3) SECP256K1_ARG_NONNULL(4) SECP256K1_ARG_NONNULL(5);
@@ -235,7 +236,7 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_ecdsa_recover_compact(
  */
 SECP256K1_WARN_UNUSED_RESULT int secp256k1_point_multiply(
   unsigned char *point,
-  int *pointlen,
+  size_t *pointlen,
   const unsigned char *scalar
 ) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3);
 
@@ -260,7 +261,7 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_ec_seckey_verify(
 SECP256K1_WARN_UNUSED_RESULT int secp256k1_ec_pubkey_verify(
   const secp256k1_context_t* ctx,
   const unsigned char *pubkey,
-  int pubkeylen
+  size_t pubkeylen
 ) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2);
 
 /** Compute the public key for a secret key.
@@ -277,7 +278,7 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_ec_pubkey_verify(
 SECP256K1_WARN_UNUSED_RESULT int secp256k1_ec_pubkey_create(
   const secp256k1_context_t* ctx,
   unsigned char *pubkey,
-  int *pubkeylen,
+  size_t *pubkeylen,
   const unsigned char *seckey,
   int compressed
 ) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3) SECP256K1_ARG_NONNULL(4);
@@ -294,7 +295,7 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_ec_pubkey_create(
 SECP256K1_WARN_UNUSED_RESULT int secp256k1_ec_pubkey_decompress(
   const secp256k1_context_t* ctx,
   unsigned char *pubkey,
-  int *pubkeylen
+  size_t *pubkeylen
 ) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3);
 
 /** Export a private key in DER format.
@@ -304,7 +305,7 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_ec_privkey_export(
   const secp256k1_context_t* ctx,
   const unsigned char *seckey,
   unsigned char *privkey,
-  int *privkeylen,
+  size_t *privkeylen,
   int compressed
 ) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3) SECP256K1_ARG_NONNULL(4);
 
@@ -313,7 +314,7 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_ec_privkey_import(
   const secp256k1_context_t* ctx,
   unsigned char *seckey,
   const unsigned char *privkey,
-  int privkeylen
+  size_t privkeylen
 ) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3);
 
 /** Tweak a private key by adding tweak to it. */
@@ -329,7 +330,7 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_ec_privkey_tweak_add(
 SECP256K1_WARN_UNUSED_RESULT int secp256k1_ec_pubkey_tweak_add(
   const secp256k1_context_t* ctx,
   unsigned char *pubkey,
-  int pubkeylen,
+  size_t pubkeylen,
   const unsigned char *tweak
 ) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(4);
 
@@ -346,7 +347,7 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_ec_privkey_tweak_mul(
 SECP256K1_WARN_UNUSED_RESULT int secp256k1_ec_pubkey_tweak_mul(
   const secp256k1_context_t* ctx,
   unsigned char *pubkey,
-  int pubkeylen,
+  size_t pubkeylen,
   const unsigned char *tweak
 ) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(4);
 
@@ -392,8 +393,8 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_pedersen_blind_sum(
   const secp256k1_context_t* ctx,
   unsigned char *blind_out,
   const unsigned char * const *blinds,
-  int n,
-  int npositive
+  size_t n,
+  size_t npositive
 )SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3);
 
 /** Verify a tally of pedersen commitments
@@ -416,9 +417,9 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_pedersen_blind_sum(
 SECP256K1_WARN_UNUSED_RESULT int secp256k1_pedersen_verify_tally(
   const secp256k1_context_t* ctx,
   const unsigned char * const *commits,
-  int pcnt,
+  size_t pcnt,
   const unsigned char * const *ncommits,
-  int ncnt,
+  size_t ncnt,
   int64_t excess
 )SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(4);
 
@@ -438,7 +439,7 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_rangeproof_verify(
  uint64_t *max_value,
  const unsigned char *commit,
  const unsigned char *proof,
- int plen
+ size_t plen
 )SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3) SECP256K1_ARG_NONNULL(4) SECP256K1_ARG_NONNULL(5);
 
 /** Verify a range proof proof and rewind the proof to recover information sent by its author.
@@ -467,7 +468,7 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_rangeproof_rewind(
  uint64_t *max_value,
  const unsigned char *commit,
  const unsigned char *proof,
- int plen
+ size_t plen
 )SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(6) SECP256K1_ARG_NONNULL(7) SECP256K1_ARG_NONNULL(8) SECP256K1_ARG_NONNULL(9) SECP256K1_ARG_NONNULL(10);
 
 /** Author a proof that a committed value is within a range.
@@ -495,7 +496,7 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_rangeproof_rewind(
 SECP256K1_WARN_UNUSED_RESULT int secp256k1_rangeproof_sign(
  const secp256k1_context_t* ctx,
  unsigned char *proof,
- int *plen,
+ size_t *plen,
  uint64_t min_value,
  const unsigned char *commit,
  const unsigned char *blind,
@@ -523,7 +524,7 @@ SECP256K1_WARN_UNUSED_RESULT int secp256k1_rangeproof_info(
  uint64_t *min_value,
  uint64_t *max_value,
  const unsigned char *proof,
- int plen
+ size_t plen
 )SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3) SECP256K1_ARG_NONNULL(4) SECP256K1_ARG_NONNULL(5);
 
 # ifdef __cplusplus
